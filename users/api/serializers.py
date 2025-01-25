@@ -32,23 +32,19 @@ class LoginSerializer(serializers.Serializer):
         username = data.get("username")
         email = data.get("email")
         password = data.get("password")
-
-        # İstifadəçinin mövcudluğunu yoxla
+    
         try:
             user = User.objects.get(username=username, email=email)
         except User.DoesNotExist:
             raise serializers.ValidationError("Daxil edilmiş username və email mövcud deyil.")
 
-        # Parolun düzgünlüyünü yoxla
         user = authenticate(username=username, password=password)
         if user is None:
             raise serializers.ValidationError("Yanlış parol.")
 
-        # Login vaxtını yenilə
         user.last_login = timezone.now()
         user.save()
 
-        # Tokenləri yarat
         refresh = RefreshToken.for_user(user)
         data["tokens"] = {
             "refresh": str(refresh),

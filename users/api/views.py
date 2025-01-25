@@ -20,25 +20,22 @@ User = get_user_model()
 
 class RegisterAPIView(CreateAPIView):
     serializer_class = UserRegistrationSerializer
-    permission_classes = [AllowAny]  # Allow anyone to access registration API
+    permission_classes = [AllowAny]  
     
     def create(self, request, *args, **kwargs):
-        # Validate and create the user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()  # This creates the user
+        user = serializer.save()  
         
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)  # Create a refresh token for the new user
+        refresh = RefreshToken.for_user(user) 
         token_data = {
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }
-    
-        # Prepare the response data
+        
         response_data = {
-            "user": serializer.data,  # The user data from the serializer
-            "tokens": token_data,  # The generated tokens
+            "user": serializer.data,  
+            "tokens": token_data,  
         }
         
         return Response(response_data, status=201)
@@ -62,7 +59,6 @@ class UserProfileView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        
         return self.request.user
     
 
